@@ -50,3 +50,18 @@ Future improvements:
 - Email notifications
 - Leave balance calculation
 - Deployment on a cloud platform
+
+**Admin**
+- Username: `admin`
+- Password: `admin123`
+- Access: Employee management, leave management, approval/rejection, dashboard and reports.
+
+**Manager**
+- Username: `manager`
+- Password: `manager123`
+- Access: View employees, manage leave requests and approve/reject employee leave.
+
+**Employee**
+- Username: `employee`
+- Password: `employee123`
+- Access: View profile and submit leave requests.
