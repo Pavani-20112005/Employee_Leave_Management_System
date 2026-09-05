@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - LeaveManager{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Dashboard</h1>
+    <p class="subtitle">
+      Real-time overview of your organization's leave management
+      {% if role == 'employee' %}
+      <span
+        style="background: #4299e1; color: white; padding: 2px 12px; border-radius: 20px; font-size: 0.75rem; margin-left: 8px;">Employee</span>
+      {% elif role == 'manager' %}
+      <span
+        style="background: #48bb78; color: white; padding: 2px 12px; border-radius: 20px; font-size: 0.75rem; margin-left: 8px;">Manager</span>
+      {% elif role == 'admin' %}
+      <span
+        style="background: #ed8936; color: white; padding: 2px 12px; border-radius: 20px; font-size: 0.75rem; margin-left: 8px;">Admin</span>
+      {% endif %}
+    </p>
+  </div>
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+    <a href="{{ url_for('leave') }}" class="btn btn-primary">📤 New Leave Request</a>
+    {% if role == 'admin' or role == 'manager' %}
+    <a href="{{ url_for('add_employee') }}" class="btn btn-outline">👤 Add Employee</a>
+    {% endif %}
+    <a href="{{ url_for('logout') }}" class="btn btn-danger" style="background: #dc3545;">🚪 Logout</a>
+  </div>
+</div>
+
+<!-- STATISTICS CARDS -->
+<div class="cards">
+  {% if role == 'admin' or role == 'manager' %}
+  <!-- Manager/Admin Cards -->
+  <div class="card">
+    <div class="card-icon blue">👥</div>
+    <b>{{ stats.employees }}</b>
+    <span>Total Employees</span>
+    <div class="trend up">↑ Active</div>
+  </div>
+  <div class="card">
+    <div class="card-icon yellow">⏳</div>
+    <b>{{ stats.pending }}</b>
+    <span>Pending Requests</span>
+    <div class="trend {% if stats.pending > 0 %}up{% else %}down{% endif %}">
+      {{ '↑ Needs attention' if stats.pending > 0 else '✓ All clear' }}
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-icon green">✅</div>
+    <b>{{ stats.approved }}</b>
+    <span>Approved</span>
+    <div class="trend up">✓ Confirmed</div>
+  </div>
+  <div class="card">
+    <div class="card-icon red">❌</div>
+    <b>{{ stats.rejected }}</b>
+    <span>Rejected</span>
+    <div class="trend down">✗ Declined</div>
+  </div>
+  {% else %}
+  <!-- EMPLOYEE CARDS - Personal Statistics -->
+  <div class="card">
+    <div class="card-icon blue">📋</div>
+    <b>{{ stats.total }}</b>
+    <span>My Total Leaves</span>
+    <div class="trend up">📊 History</div>
+  </div>
+  <div class="card">
+    <div class="card-icon yellow">⏳</div>
+    <b>{{ stats.pending }}</b>
+    <span>My Pending</span>
+    <div class="trend {% if stats.pending > 0 %}up{% else %}down{% endif %}">
+      {{ '⏳ Waiting' if stats.pending > 0 else '✓ All clear' }}
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-icon green">✅</div>
+    <b>{{ stats.approved }}</b>
+    <span>My Approved</span>
+    <div class="trend up">✓ Confirmed</div>
+  </div>
+  <div class="card">
+    <div class="card-icon red">❌</div>
+    <b>{{ stats.rejected }}</b>
+    <span>My Rejected</span>
+    <div class="trend down">✗ Declined</div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- LEAVE REQUESTS TABLE -->
+<div class="table-container">
+  <div class="table-header">
+    <h2>
+      {% if role == 'admin' or role == 'manager' %}
+      📋 Recent Leave Requests
+      {% else %}
+      📋 My Leave History
+      {% endif %}
+    </h2>
+    <span class="badge">{{ recent|length }} latest</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        {% if role == 'admin' or role == 'manager' %}
+        <th>Employee</th>
+        {% endif %}
+        <th>Leave Type</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in recent %}
+      <tr>
+        {% if role == 'admin' or role == 'manager' %}
+        <td><strong>{{ r.name }}</strong></td>
+        {% endif %}
+        <td>{{ r.leave_type }}</td>
+        <td>{{ r.start_date }}</td>
+        <td>{{ r.end_date }}</td>
+        <td>
+          <span class="status-badge {{ r.status.lower() }}">
+            <span class="dot"></span>
+            {{ r.status }}
+          </span>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="{% if role == 'admin' or role == 'manager' %}5{% else %}4{% endif %}">
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <h3>No leave requests yet</h3>
+            <p>Submit your first leave request to get started.</p>
+            <br>
+            <a href="{{ url_for('leave') }}" class="btn btn-primary">📤 Submit Leave Request</a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

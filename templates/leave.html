@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Leave Requests - LeaveManager{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>📋 Leave Requests</h1>
+        <p class="subtitle">Submit and manage employee leave requests</p>
+    </div>
+</div>
+
+<div class="form-container" style="margin-bottom: 2rem;">
+    <h2 style="margin-bottom: 1.5rem; font-size: 1.25rem;">Submit New Leave Request</h2>
+    <form method="post">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Employee <span class="required">*</span></label>
+                <select name="employee_id" class="form-control" required>
+                    <option value="">Select employee...</option>
+                    {% for e in employees %}
+                    <option value="{{ e.id }}">{{ e.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Leave Type <span class="required">*</span></label>
+                <select name="leave_type" class="form-control" required>
+                    <option value="Casual">🏖️ Casual</option>
+                    <option value="Sick">🤒 Sick</option>
+                    <option value="Annual">🌴 Annual</option>
+                    <option value="Personal">🧘 Personal</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Start Date <span class="required">*</span></label>
+                <input type="date" name="start_date" class="form-control" min="{{ today }}" required>
+            </div>
+            <div class="form-group">
+                <label>End Date <span class="required">*</span></label>
+                <input type="date" name="end_date" class="form-control" min="{{ today }}" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Reason</label>
+            <textarea name="reason" class="form-control"
+                placeholder="Please provide details about your leave request..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+            📤 Submit Leave Request
+        </button>
+    </form>
+</div>
+
+<div class="table-container">
+    <div class="table-header">
+        <h2>All Leave Requests</h2>
+        <span class="badge">{{ leaves|length }} total</span>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Type</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th style="text-align: center;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for l in leaves %}
+            <tr>
+                <td><strong>{{ l.name }}</strong></td>
+                <td>{{ l.leave_type }}</td>
+                <td>{{ l.start_date }}</td>
+                <td>{{ l.end_date }}</td>
+                <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ l.reason or '—' }}
+                </td>
+                <td>
+                    <span class="status-badge {{ l.status.lower() }}">
+                        <span class="dot"></span>
+                        {{ l.status }}
+                    </span>
+                </td>
+                <td style="text-align: center;">
+                    {% if l.status == "Pending" %}
+                    <div class="btn-group" style="justify-content: center;">
+                        <form method="post" action="{{ url_for('update_leave', leave_id=l.id, action='approve') }}">
+                            <button type="submit" class="btn btn-success btn-sm">✅ Approve</button>
+                        </form>
+                        <form method="post" action="{{ url_for('update_leave', leave_id=l.id, action='reject') }}">
+                            <button type="submit" class="btn btn-danger btn-sm">❌ Reject</button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <span style="color: var(--gray-400); font-size: 0.85rem;">—</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7">
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <h3>No leave requests</h3>
+                        <p>Submit a leave request to get started.</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

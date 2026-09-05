@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - LeaveManager{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="page-header">
+        <div>
+            <h1>👤 Profile</h1>
+            <p class="subtitle">Your account information</p>
+        </div>
+        <a href="{{ url_for('change_password') }}" class="btn btn-outline">Change Password</a>
+    </div>
+
+    <div
+        style="background: white; padding: 2rem; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--gray-200);">
+        <div style="display: grid; gap: 1rem;">
+            <div>
+                <label style="color: var(--gray-500); font-size: 0.85rem; font-weight: 600;">Username</label>
+                <div style="font-size: 1.1rem; font-weight: 500; padding: 0.5rem 0;">{{ user.username }}</div>
+            </div>
+            <div>
+                <label style="color: var(--gray-500); font-size: 0.85rem; font-weight: 600;">Email</label>
+                <div style="font-size: 1.1rem; padding: 0.5rem 0;">{{ user.email }}</div>
+            </div>
+            <div>
+                <label style="color: var(--gray-500); font-size: 0.85rem; font-weight: 600;">Role</label>
+                <div>
+                    <span class="status-badge {{ user.role }}" style="padding: 6px 16px;">
+                        <span class="dot"></span>
+                        {{ user.role|title }}
+                    </span>
+                </div>
+            </div>
+            <div>
+                <label style="color: var(--gray-500); font-size: 0.85rem; font-weight: 600;">Account Status</label>
+                <div>
+                    <span class="status-badge {% if user.is_active %}approved{% else %}rejected{% endif %}"
+                        style="padding: 6px 16px;">
+                        <span class="dot"></span>
+                        {{ 'Active' if user.is_active else 'Inactive' }}
+                    </span>
+                </div>
+            </div>
+            <div>
+                <label style="color: var(--gray-500); font-size: 0.85rem; font-weight: 600;">Member Since</label>
+                <div style="padding: 0.5rem 0;">{{ user.created_at }}</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem; border-top: 1px solid var(--gray-200); padding-top: 1.5rem; text-align: center;">
+            <a href="{{ url_for('logout') }}" class="btn btn-danger" style="padding: 10px 30px;">
+                🚪 Logout
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

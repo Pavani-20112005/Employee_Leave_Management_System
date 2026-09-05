@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Employees - LeaveManager{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>👥 Employees</h1>
+        <p class="subtitle">Manage your organization's workforce</p>
+    </div>
+    <a href="{{ url_for('add_employee') }}" class="btn btn-primary">➕ Add Employee</a>
+</div>
+
+<div class="search-container" style="margin-bottom: 1.5rem;">
+    <form method="get" style="display: flex; gap: 0.75rem; flex: 1;">
+        <input type="text" name="q" value="{{ q }}" placeholder="🔍 Search by name, department, or role..."
+            style="flex: 1;">
+        <button type="submit" class="btn btn-primary">Search</button>
+        {% if q %}
+        <a href="{{ url_for('employees') }}" class="btn btn-outline">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="table-container">
+    <div class="table-header">
+        <h2>All Employees</h2>
+        <span class="badge">{{ employees|length }} total</span>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Role</th>
+                <th style="text-align: center;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in employees %}
+            <tr>
+                <td>#{{ e.id }}</td>
+                <td><strong>{{ e.name }}</strong></td>
+                <td><a href="mailto:{{ e.email }}" style="color: var(--primary); text-decoration: none;">{{ e.email
+                        }}</a></td>
+                <td><span
+                        style="background: var(--gray-100); padding: 2px 12px; border-radius: 20px; font-size: 0.85rem;">{{
+                        e.department }}</span></td>
+                <td>{{ e.role }}</td>
+                <td style="text-align: center;">
+                    <form method="post" action="{{ url_for('delete_employee', employee_id=e.id) }}"
+                        onsubmit="return confirm('Are you sure you want to delete this employee?');">
+                        <button type="submit" class="btn btn-danger btn-sm">🗑️ Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6">
+                    <div class="empty-state">
+                        <div class="empty-icon">👤</div>
+                        <h3>No employees found</h3>
+                        <p>{% if q %}No results match your search.{% else %}Add your first employee to get started.{%
+                            endif %}</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
